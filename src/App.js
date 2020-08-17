@@ -1,7 +1,7 @@
-import React from "react";
-import "./App.css";
-import mondaySdk from "monday-sdk-js";
-import SpinWheel from "./SpinWheel";
+import React from 'react';
+import './App.css';
+import mondaySdk from 'monday-sdk-js';
+import SpinWheel from './SpinWheel';
 
 
 const monday = mondaySdk();
@@ -14,35 +14,59 @@ class AppSolution extends React.Component {
     this.state = {
       settings: {},
       context: {},
-      name: "",
+      name: '',
+      winners: []
     };
   }
 
   componentDidMount() {
     // TODO: set up event listeners
-    // monday.listen("settings", (res) => {
+    // monday.listen('settings', (res) => {
     //   this.setState({ settings: res.data });
     // });
 
-    monday.listen("context", res => {
+    monday.listen('context', async (res) => {
       this.setState({context: res.data});
       console.log(res.data);
-      monday.api(`query ($boardIds: [Int]) { boards (ids:$boardIds) { name items(limit:1) { name column_values { title text } } } }`,
-        { variables: {boardIds: this.state.context.boardIds} }
-      )
-      .then(res => {
-        this.setState({boardData: res.data});
+      const res2 = await monday.api(`
+        query ($boardIds: [Int]) {
+          boards (ids: $boardIds) {
+            name
+            items (limit: 3) {
+              name
+              column_values {
+                title
+                text
+              }
+            }
+          }
+        }  
+      `, {
+        variables: {
+          boardIds: this.state.context.boardIds
+        }
       });
+      this.setState({boardData: res2.data});
     })
+  }
+
+  resultHandler = (result) => {
+    console.log('result=', result);
+
+    monday.execute('notice', { 
+      message: 'Congratulations! You won ' + result,
+      type: 'success', // or 'error' (red), or 'info' (blue)
+      timeout: 10000,
+    });
   }
 
   render() {
     return (
       <div
-        className="App"
+        className='App'
         style={{ background: this.state.settings.background }}
       >
-        <SpinWheel></SpinWheel>
+        <SpinWheel whenResult={this.resultHandler}></SpinWheel>
       </div>
     );
   }

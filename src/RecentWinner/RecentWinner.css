@@ -1,0 +1,25 @@
+.RecentWinner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 10px;
+  color: white;
+}
+
+.RecentWinner .left {
+  flex: 0 0 70px;
+}
+
+.RecentWinner .middle {
+  text-align: left;
+  flex: 1 1 auto;
+}
+
+.RecentWinner .right {
+  flex: 0 0 100px;
+}
+
+.RecentWinner img {
+  height: 40px;
+  width: 40px;
+}

@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import jackpotImg from "./jackpot.png"
 
 class SpinWheel extends React.Component {
@@ -176,6 +175,8 @@ class SpinWheel extends React.Component {
     } else {
       result = list.length + count;
     }
+
+    this.props.whenResult(result);
 
     // set state variable to display result
     this.setState({

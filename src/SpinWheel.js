@@ -176,7 +176,7 @@ class SpinWheel extends React.Component {
       result = list.length + count;
     }
 
-    this.props.whenResult(result);
+    this.props.whenResult(list[result]);
 
     // set state variable to display result
     this.setState({

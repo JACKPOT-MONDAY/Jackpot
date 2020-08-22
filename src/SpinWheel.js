@@ -191,7 +191,8 @@ class SpinWheel extends React.Component {
       rotate: 0,
       easeOut: 0,
       result: null,
-      spinning: false
+      spinning: false,
+      ended: false
     });
   };
 
@@ -223,7 +224,7 @@ class SpinWheel extends React.Component {
         )}
 
         {this.state.ended ? (<div className="display" style={{display:"block"}}>
-        <button>x</button>
+        <button onClick={this.reset}>x</button>
         <h1 id="readout">Congratulations! You have won</h1>
         <p id="result">{this.state.list[this.state.result]}</p>
         <img src={jackpotImg} width="100px" alt=""></img>

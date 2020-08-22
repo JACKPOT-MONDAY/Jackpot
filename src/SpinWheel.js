@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import jackpotImg from "./jackpot.png"
 
 class SpinWheel extends React.Component {
   state = {
@@ -10,13 +11,9 @@ class SpinWheel extends React.Component {
       "$1",
       "$60",
       "$1,000",
-      "$4.44",
-      "$0",
-      "$333"
+      
     ],
-    // list: ["$100", "$500", "$9,999", "$1", "$60", "$1,000", "$4.44"],
-    // list: ["$100","$500","$9,999","$1","$60"],
-    radius: 75, // PIXELS
+    radius: 100, // PIXELS
     rotate: 0, // DEGREES
     easeOut: 0, // SECONDS
     angle: 0, // RADIANS
@@ -24,12 +21,20 @@ class SpinWheel extends React.Component {
     offset: null, // RADIANS
     net: null, // RADIANS
     result: null, // INDEX
-    spinning: false
+    spinning: false,
+    colors: ["#FB275D","#FFCC00", "#00CC6F", "#A358DF", "#00CFF4"],
+    ended:false
   };
 
   componentDidMount() {
     // generate canvas wheel on load
     this.renderWheel();
+  }
+
+  getColor() {
+    // randomly generate rbg values for wheel sectors
+    let h = Math.floor(Math.random() * 360);
+    return `hsl(${h},100%,100%)`;
   }
 
   renderWheel() {
@@ -45,11 +50,27 @@ class SpinWheel extends React.Component {
 
     // dynamically generate sectors from state list
     let angle = 0;
+    let tempColors = [...this.state.colors];
     for (let i = 0; i < numOptions; i++) {
       let text = this.state.list[i];
-      this.renderSector(i + 1, text, angle, arcSize, this.getColor());
+      this.renderSector(i + 1, text, angle, arcSize, tempColors);
+      console.log(this.getColor())
       angle += arcSize;
     }
+    let canvas = document.getElementById("wheel");
+    let x = canvas.width / 2;
+    let y = canvas.height / 2;
+    let ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.save();
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowColor = "rgba(0,0,0,0.55)";
+    ctx.arc(x, y, 90, 0, 2* Math.PI);
+    ctx.fillStyle = "rgb(240,240,240,1)";
+    ctx.fill();
+    ctx.restore();
   }
 
   topPosition = (num, angle) => {
@@ -80,7 +101,7 @@ class SpinWheel extends React.Component {
     });
   };
 
-  renderSector(index, text, start, arc, color) {
+  renderSector(index, text, start, arc, tempColors) {
     // create canvas arc for each list element
     let canvas = document.getElementById("wheel");
     let ctx = canvas.getContext("2d");
@@ -88,37 +109,36 @@ class SpinWheel extends React.Component {
     let y = canvas.height / 2;
     let radius = this.state.radius;
     let startAngle = start;
-    let endAngle = start + arc;
+    let endAngle = start + arc - 2*(Math.PI/180);
     let angle = index * arc;
-    let baseSize = radius * 3.33;
-    let textRadius = baseSize - 150;
+    if (tempColors.length === 0){tempColors = [...this.state.colors]}
+    let color = tempColors.splice(Math.floor(Math.random()*tempColors.length),1)
+    ctx.save();
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.shadowColor = "rgba(0,0,0,0.65)";
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.arc(x, y, radius*2, startAngle, endAngle, false);
+    ctx.lineTo(x,y);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
 
     ctx.beginPath();
-    ctx.arc(x, y, radius, startAngle, endAngle, false);
-    ctx.lineWidth = radius * 2;
-    ctx.strokeStyle = color;
-
-    ctx.font = "17px Arial";
-    ctx.fillStyle = "black";
+    ctx.font = "13px Arial";
+    ctx.fillStyle = "white";
     ctx.stroke();
-
     ctx.save();
-    ctx.translate(
-      baseSize + Math.cos(angle - arc / 2) * textRadius,
-      baseSize + Math.sin(angle - arc / 2) * textRadius
-    );
-    ctx.rotate(angle - arc / 2 + Math.PI / 2);
-    ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+    // translate to put text on sector
+    ctx.translate(250  + Math.cos(angle - arc/2 ) * 150, 250 + Math.sin(angle - arc / 2)* 150);
+    ctx.rotate(angle - arc / 2 + Math.PI / 2); //rptate text to align with sector
+    ctx.fillText(text, -ctx.measureText(text).width/1.3, 0); // put text rougly in center
     ctx.restore();
   }
 
-  getColor() {
-    // randomly generate rbg values for wheel sectors
-    let r = Math.floor(Math.random() * 255);
-    let g = Math.floor(Math.random() * 255);
-    let b = Math.floor(Math.random() * 255);
-    return `rgba(${r},${g},${b},0.4)`;
-  }
+ 
 
   spin = () => {
     // set random spin degree and ease out time
@@ -127,12 +147,14 @@ class SpinWheel extends React.Component {
     this.setState({
       rotate: randomSpin,
       easeOut: 2,
-      spinning: true
+      spinning: true,
+      ended:false
     });
 
     // calcalute result after wheel stops spinning
     setTimeout(() => {
       this.getResult(randomSpin);
+      this.setState({ended:true});
     }, 2000);
   };
 
@@ -160,8 +182,6 @@ class SpinWheel extends React.Component {
       net: netRotation,
       result: result
     });
-
-    this.props.whenResult(this.state.list[this.state.result]);
   };
 
   reset = () => {
@@ -177,8 +197,8 @@ class SpinWheel extends React.Component {
   render() {
     return (
       <div className="App">
-        <h1>Spinning Prize Wheel React</h1>
-        <span id="selector">&#9660;</span>
+        <span id="selector1">&#9660;</span>
+        <span id="selector2">&#9660;</span>
         <canvas
           id="wheel"
           width="500"
@@ -200,12 +220,15 @@ class SpinWheel extends React.Component {
             spin
           </button>
         )}
-        <div class="display">
-          <span id="readout">
-            YOU WON:{"  "}
-            <span id="result">{this.state.list[this.state.result]}</span>
-          </span>
-        </div>
+
+        {this.state.ended ? (<div className="display" style={{display:"block"}}>
+        <button>x</button>
+        <h1 id="readout">Congratulations! You have won</h1>
+        <p id="result">{this.state.list[this.state.result]}</p>
+        <img src={jackpotImg} width="100px" alt=""></img>
+        
+      </div>):(<div></div>)}
+        
       </div>
     );
   }

@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import mondaySdk from 'monday-sdk-js';
 import SpinWheel from './SpinWheel';
 import dayjs from 'dayjs';
@@ -79,20 +78,21 @@ class AppSolution extends React.Component {
 
     this.setState((prevState) => { 
       let recentWinners = prevState.recentWinners;
-      
-      recentWinners.unshift({
-        created: dayjs().format(),
-        image: prevState.me.photo_thumb,
-        name: prevState.me.name,
-        result
-      });
-
+      if (prevState.me) {
+        recentWinners.unshift({
+          created: dayjs().format(),
+          image: prevState.me.photo_thumb,
+          name: prevState.me.name,
+          result
+        });
+        
       if (recentWinners.length > 6) {
         recentWinners = recentWinners.slice(0, 6);
       }
 
-      monday.storage.instance.setItem('recentWinners', JSON.stringify(recentWinners));
-
+       monday.storage.instance.setItem('recentWinners', JSON.stringify(recentWinners));
+      }
+      
       return { recentWinners };
     });
   }
@@ -100,10 +100,8 @@ class AppSolution extends React.Component {
   render() {
     return (
       <div className="App">
-        <div>
-          <SpinWheel whenResult={this.resultHandler}></SpinWheel>
-        </div>
-        <div>
+        <SpinWheel whenResult={this.resultHandler}></SpinWheel>
+        <div id="recentWinnersDiv">
           <h2>Recent Winners</h2>
           {this.state.recentWinners.map((recentWinner, i) => {
             return <RecentWinner key={i} recentWinner={recentWinner}/>;

@@ -198,20 +198,17 @@ class SpinWheel extends React.Component {
 
   render() {
     return (
-      <div className="App">
-        <span id="selector1">&#9660;</span>
-        <span id="selector2">&#9660;</span>
+      <React.Fragment>
+      <div className="spinWheelSection">
+        <span id="selector">&#9660;</span>
         <canvas
           id="wheel"
           width="500"
           height="500"
           style={{
             WebkitTransform: `rotate(${this.state.rotate}deg)`,
-            WebkitTransition: `-webkit-transform ${
-              this.state.easeOut
-            }s ease-out`
-          }}
-        />
+            WebkitTransition: `-webkit-transform ${this.state.easeOut}s ease-out`}}></canvas>
+        
 
         {this.state.spinning ? (
           <button type="button" id="reset" onClick={this.reset}>
@@ -222,18 +219,21 @@ class SpinWheel extends React.Component {
             spin
           </button>
         )}
-
-        {this.state.ended ? (<div className="display" style={{display:"block"}}>
-        <button onClick={this.reset}>x</button>
-        <h1 id="readout">Congratulations! You have won</h1>
-        <p id="result">{this.state.list[this.state.result]}</p>
-        <img src={jackpotImg} width="100px" alt=""></img>
-        
-      </div>):(<div></div>)}
-        
       </div>
+
+      {this.state.ended ? (<div className="display" style={{display:"block"}}>
+        
+      <h1 id="readout">Congratulations, you win!</h1>
+      <p id="result">{this.state.list[this.state.result]}</p>
+      <button id="exitWin" onClick={this.reset}>Okay, take me back!</button>
+      <img src={jackpotImg}  alt=""></img>
+    </div>):(<div></div>)}
+
+      
+      </React.Fragment>
     );
   }
+  
 }
 
 export default SpinWheel;

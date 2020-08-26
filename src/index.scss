@@ -1,0 +1,122 @@
+#spin, #exitWin {
+    border: 1px solid #00cc6f;
+
+    &:hover {
+        color: white;
+        background-color: #00cc6f;
+        border-color: rgb(0, 180, 120);
+    }
+}
+
+#reset {
+    border: 1px solid red;
+
+    &:hover {
+        color: white;
+        background-color: red;
+        border-color: rgb(255, 87, 115);
+    }
+}
+
+
+#spin:focus,
+#reset:focus {
+    outline: none;
+}
+
+
+
+.display {
+    grid-column: 1 / 2;
+    opacity: .95;
+    display: none;
+    position: absolute;
+    background-color: rgb(248, 248, 248);
+    z-index: 900;
+    transition: display 2s ease-in 3s;
+    padding: 5rem;
+    width: 70%;
+    #readout {
+        font-size: 3rem;
+        margin: 0, auto;
+    }
+
+    #result {
+        margin: 0;
+        font-size: 4rem;
+        color: #00cc6f;
+    }
+
+    img {
+        width: 300px;
+        position: relative;
+        bottom: -50px;
+        right: -300px;
+        z-index: 0;
+    }
+
+    #exitWin {
+        display: block;
+        margin: 3rem 0 0 0;
+        padding:1rem 3rem;
+    }
+}
+
+.App {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    font-family: 'Roboto', sans-serif;
+}
+
+.spinWheelSection {
+    grid-column: 1 / 2;
+    display: grid;
+    grid-template-rows: 40px 450px 100px;
+
+    justify-content: center;
+
+    #selector {
+        grid-row: 1 / 2;
+        text-align: center;
+        font-size: 3rem;
+        color: rgb(86, 5, 161);
+
+    }
+
+    #spin,
+    #reset {
+        grid-row: 3 / 4;
+        width: fit-content;
+        height: fit-content;
+        margin: 0 auto;
+        background-color: white;
+        padding: 1rem 3rem;
+        font-size: 1.3rem;
+        cursor: pointer;
+    }
+
+    button {
+
+        width: fit-content;
+        height: fit-content;
+        border: 1px solid rgb(202, 202, 202);
+        background-color: white;
+
+        font-size: 1.3rem;
+        cursor: pointer;
+    }
+}
+
+#recentWinnersDiv{
+    grid-column: 2 / 3 !important;
+    grid-row: 1 / 2 !important;
+}
+
+canvas {
+    z-index: -1;
+    position: relative;
+    top: -50px;
+    width: 500px;
+    height: 500px;
+}

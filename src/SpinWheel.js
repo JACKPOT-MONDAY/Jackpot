@@ -200,6 +200,7 @@ class SpinWheel extends React.Component {
     return (
       <React.Fragment>
       <div className="spinWheelSection">
+        <div className="jackpotContainer">Current Jackpot:<br/><span className="bold">${Math.round(this.props.currentJackpot)}</span></div>
         <span id="selector">&#9660;</span>
         <canvas
           id="wheel"

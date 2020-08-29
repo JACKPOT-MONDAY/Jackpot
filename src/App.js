@@ -18,15 +18,16 @@ class AppSolution extends React.Component {
       name: '',
       recentWinners: [],
       recentSpins: [],
-      me: null
+      me: null,
+      jackpot: 0
     };
   }
 
   async componentDidMount() {
-    // TODO: set up event listeners
-    // monday.listen('settings', (res) => {
-    //   this.setState({ settings: res.data });
-    // });
+    monday.listen('settings', (res) => {
+      console.log('settings=', res.data);
+      this.setState({ settings: res.data });
+    });
 
     const res = await monday.api(`
       query {
@@ -37,18 +38,22 @@ class AppSolution extends React.Component {
       }
     `);
     const me = res.data.me;
+    console.log('me=', me);
     this.setState({ me });
 
     monday.listen('context', async (res) => {
       this.setState({context: res.data});
-      console.log(res.data);
+      console.log('context=', res.data);
       const res2 = await monday.api(`
         query ($boardIds: [Int]) {
           boards (ids: $boardIds) {
+            id
             name
             items (limit: 3) {
+              id
               name
               column_values {
+                id
                 title
                 text
               }
@@ -57,9 +62,10 @@ class AppSolution extends React.Component {
         }  
       `, {
         variables: {
-          boardIds: this.state.context.boardIds
+          boardIds: [this.state.context.boardIds[0]]
         }
       });
+      console.log('boardData=', res2.data);
       this.setState({boardData: res2.data});
     });
 
@@ -86,11 +92,11 @@ class AppSolution extends React.Component {
           result
         });
         
-      if (recentWinners.length > 6) {
-        recentWinners = recentWinners.slice(0, 6);
-      }
+        if (recentWinners.length > 6) {
+          recentWinners = recentWinners.slice(0, 6);
+        }
 
-       monday.storage.instance.setItem('recentWinners', JSON.stringify(recentWinners));
+        monday.storage.instance.setItem('recentWinners', JSON.stringify(recentWinners));
       }
       
       return { recentWinners };
@@ -100,7 +106,7 @@ class AppSolution extends React.Component {
   render() {
     return (
       <div className="App">
-        <SpinWheel whenResult={this.resultHandler}></SpinWheel>
+        <SpinWheel whenResult={this.resultHandler} currentJackpot={this.state.jackpot}></SpinWheel>
         <div id="recentWinnersDiv">
           <h2>Recent Winners</h2>
           {this.state.recentWinners.map((recentWinner, i) => {

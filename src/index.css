@@ -74,6 +74,7 @@
 }
 
 .spinWheelSection {
+  position: relative;
   -ms-grid-column: 1;
   -ms-grid-column-span: 1;
   grid-column: 1 / 2;
@@ -143,3 +144,19 @@ canvas {
   height: 500px;
 }
 /*# sourceMappingURL=index.css.map */
+
+.jackpotContainer {
+  position: absolute;
+  top: 210px;
+  left: 177px;
+  text-align: center;
+  font-size: 20px;
+  line-height: 32px;
+  color: #333;
+}
+
+.jackpotContainer .bold {
+  font-weight: bold;
+  font-size: 30px;
+  color: green;
+}

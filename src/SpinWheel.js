@@ -4,13 +4,20 @@ import jackpotImg from "./jackpot.png"
 class SpinWheel extends React.Component {
   state = {
     list: [
-      "$100",
-      "$500",
-      "$9,999",
-      "$1",
-      "$60",
-      "$1,000",
-      
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$0",
+      "$" + this.props.currentJackpot
     ],
     radius: 100, // PIXELS
     rotate: 0, // DEGREES

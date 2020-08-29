@@ -207,7 +207,7 @@ class SpinWheel extends React.Component {
     return (
       <React.Fragment>
       <div className="spinWheelSection">
-        <div className="jackpotContainer">Current Jackpot:<br/><span className="bold">${Math.round(this.props.currentJackpot)}</span></div>
+        
         <span id="selector">&#9660;</span>
         <canvas
           id="wheel"
@@ -231,13 +231,13 @@ class SpinWheel extends React.Component {
 
       {this.state.ended ? (<div className="display" style={{display:"block"}}>
         
-      <h1 id="readout">Congratulations, you win!</h1>
+      <h1 id="readout">{this.state.list[this.state.result] === "$0"? "Awe, better luck next time! You got:": "Congratulations, you win!"}</h1>
       <p id="result">{this.state.list[this.state.result]}</p>
       <button id="exitWin" onClick={this.reset}>Okay, take me back!</button>
       <img src={jackpotImg}  alt=""></img>
     </div>):(<div></div>)}
 
-      
+      <div className="jackpotContainer">Current Jackpot:<br/><span className="bold">${Math.round(this.props.currentJackpot)}</span></div>
       </React.Fragment>
     );
   }

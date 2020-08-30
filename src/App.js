@@ -64,11 +64,8 @@ class AppSolution extends React.Component {
       const me = this.state.me;
       let spinsRemaining = 0;
       
-      const settingsExist = settings && settings["status_column"] && settings["completed_status"] && settings["jackpot_increase"];
-      // console.log("jackpotContext=",context);
-      // console.log("if conditional", !context || !settingsExist  || !context.boardIds || !context.boardIds[0])
-      // console.log("settings exist",!settingsExist)
-      // console.log("settings",settings)
+      const settingsExist = settings && settings["status_column"] && settings["person_column"] && settings["completed_status"] && settings["jackpot_increase"];
+
       if (!me || !me.name || !context || !settingsExist  || !context.boardIds || !context.boardIds[0]) return;
 
       const res2 = await monday.api(`
@@ -107,7 +104,7 @@ class AppSolution extends React.Component {
         let rowStatus = null;
         let rowPerson = null;
         const status_column = Object.keys(settings.status_column)[0];
-        const person_column = 'person';
+        const person_column = Object.keys(settings.person_column)[0];
         // console.log("row column val", row.column_values);
         // console.log("status column", status_column)
         if (row.column_values && row.column_values.find(c => c.id === status_column)) {

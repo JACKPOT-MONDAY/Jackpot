@@ -123,18 +123,27 @@ canvas {
 }
 
 .jackpotContainer {
-    position: absolute;
-    text-align: center;
-    z-index:1 ;
-    top: 162px;
-    right: 195px;
-    font-size: 2rem;
-    line-height: 40px;
-    color: #333;
+  position: absolute;
+  text-align: center;
+  z-index:1 ;
+  top: 162px;
+  right: 195px;
+  font-size: 2rem;
+  line-height: 40px;
+  color: #333;
+}
+
+.jackpotContainer .bold {
+  font-weight: bold;
+  font-size: 38px;
+  color: green;
+}
+
+.spinsRemaining {
+  width: 100%;
+  text-align: center;
+
+  .bold {
+    font-size: 26px;
   }
-  
-  .jackpotContainer .bold {
-    font-weight: bold;
-    font-size: 38px;
-    color: green;
-  }
+}

@@ -163,4 +163,13 @@ canvas {
   font-size: 38px;
   color: green;
 }
+
+.spinsRemaining {
+  width: 100%;
+  text-align: center;
+}
+
+.spinsRemaining .bold {
+  font-size: 26px;
+}
 /*# sourceMappingURL=index.css.map */

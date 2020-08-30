@@ -38,8 +38,7 @@ class SpinWheel extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log("before if")
-    if (!this.props.currentJackpot || prevProps.currentJackpot === this.props.currentJackpot) {
+    if (this.props.currentJackpot === null || prevProps.currentJackpot === this.props.currentJackpot) {
       return;
     }
     console.log("passed if")
@@ -136,7 +135,7 @@ class SpinWheel extends React.Component {
     let color;
     ctx.save();
    
-    if ("$" + this.props.currentJackpot === text) {
+    if (text !== '$0') {
       // let x0 = window.innerWidth/4 - window.innerWidth/20;
       // let y0 = window.innerHeight/4 - window.innerHeight/20;
       // let x1 = window.innerWidth/2 + window.innerWidth/4 + window.innerWidth/20;
@@ -151,8 +150,7 @@ class SpinWheel extends React.Component {
       // color = ctx.createLinearGradient(300, 300, 300, 300);
       ctx.fillStyle = gradient;
     } else{
-      text = text === "$0" ? "": text;
-      console.log("text", text)
+      text = '';
       color = tempColors.splice(Math.floor(Math.random()*tempColors.length),1);
       ctx.fillStyle = color;
       
@@ -218,7 +216,7 @@ class SpinWheel extends React.Component {
       result = list.length + count;
     }
 
-    this.props.whenResult("$100");
+    this.props.whenResult(this.state.list[result]);
 
     // set state variable to display result
     this.setState({
@@ -261,10 +259,14 @@ class SpinWheel extends React.Component {
             reset
           </button>
         ) : (
-          <button type="button" id="spin" onClick={this.spin}>
+          <button type="button" id="spin" onClick={this.spin} disabled={this.props.spinsRemaining === 0}>
             spin
           </button>
         )}
+
+        <div className="spinsRemaining">
+          You have <span className="bold">{this.props.spinsRemaining}</span> spins remaining.
+        </div>
       </div>
 
       {this.state.ended ? (<div className="display" style={{display:"block"}}>

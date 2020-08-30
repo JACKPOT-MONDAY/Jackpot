@@ -15,7 +15,7 @@ class AppSolution extends React.Component {
     this.state = {
       settings: {}, // provided by Monday
       recentWinners: [], // recent winners to diplay on the right
-      recentSpins: [], // don't let someone spin more than once per week
+      spinsRemaining: 0,
       addedRows: [], // Monday rows that have already been added to the pot
       me: null, // the person viewing the app
       jackpot: 0, // dollar amount in the pot
@@ -61,13 +61,15 @@ class AppSolution extends React.Component {
   addRowsToJackpot = async () => {
       const settings = this.state.settings;
       const context = this.state.context;
+      const me = this.state.me;
+      let spinsRemaining = 0;
       
       const settingsExist = settings && settings["status_column"] && settings["completed_status"] && settings["jackpot_increase"];
       // console.log("jackpotContext=",context);
       // console.log("if conditional", !context || !settingsExist  || !context.boardIds || !context.boardIds[0])
       // console.log("settings exist",!settingsExist)
       // console.log("settings",settings)
-      if (!context || !settingsExist  || !context.boardIds || !context.boardIds[0]) return;
+      if (!me || !me.name || !context || !settingsExist  || !context.boardIds || !context.boardIds[0]) return;
 
       const res2 = await monday.api(`
         query ($boardIds: [Int]) {
@@ -96,8 +98,6 @@ class AppSolution extends React.Component {
 
       console.log("jackpopt num check=",(await monday.storage.instance.getItem('jackpot')).data.value)
       let jackpot = parseInt((await monday.storage.instance.getItem('jackpot')).data.value) || 0;
-      // this.setState(async (prevState) => { 
-      //   let jackpot = prevState.jackpot;
       const addedRows = JSON.parse((await monday.storage.instance.getItem('addedRows')).data.value) || [];
       console.log(`addedRows `, addedRows)
       console.log(`rows `, rows)
@@ -105,18 +105,23 @@ class AppSolution extends React.Component {
         const rowId = row.id;
         const rowName = row.name;
         let rowStatus = null;
+        let rowPerson = null;
         const status_column = Object.keys(settings.status_column)[0];
+        const person_column = 'person';
         // console.log("row column val", row.column_values);
         // console.log("status column", status_column)
-        if (row.column_values && row.column_values.find(c => c.id=== status_column)) {
-          
+        if (row.column_values && row.column_values.find(c => c.id === status_column)) {
           rowStatus = row.column_values.find(c => c.id === status_column).text;
         }
+        if (row.column_values && row.column_values.find(c => c.id === person_column)) {
+          rowPerson = row.column_values.find(c => c.id === person_column).text;
+        }
         
-        if (rowStatus === settings["completed_status"] && addedRows.indexOf(rowId) === -1) {
+        if (rowStatus === settings["completed_status"] && addedRows.indexOf(rowId) === -1 && me.name === rowPerson) {
           console.log('Adding new row: ' + rowId + ' - ' + rowName);
           jackpot += parseInt(settings["jackpot_increase"]);
           addedRows.push(rowId);
+          spinsRemaining++;
         }
       }
       monday.storage.instance.setItem('addedRows', JSON.stringify(addedRows));
@@ -124,7 +129,8 @@ class AppSolution extends React.Component {
       // return { addedRows, jackpot };
       this.setState({
         addedRows,
-        jackpot
+        jackpot,
+        spinsRemaining
       });
   }
 
@@ -133,8 +139,10 @@ class AppSolution extends React.Component {
 
     this.setState((prevState) => {
       let recentWinners = prevState.recentWinners || [];
-      let recentSpins = prevState.recentSpins || [];
-      let jackpot = prevState.jackpopt;
+      let jackpot = prevState.jackpot;
+      let spinsRemaining = prevState.spinsRemaining;
+
+      spinsRemaining--;
 
       if (prevState.me) {
 
@@ -153,29 +161,20 @@ class AppSolution extends React.Component {
             
           });
           jackpot = 0;
+          monday.storage.instance.setItem('jackpot', jackpot);
         }
-
-        recentSpins.unshift({
-          created: dayjs().format(),
-          name: prevState.me.name
-        });
 
         if (recentWinners.length > 6) {
           recentWinners = recentWinners.slice(0, 6);
         }
 
-        if (recentSpins.length > 999) {
-          recentWinners = recentWinners.slice(0, 999);
-        }
-
         monday.storage.instance.setItem('recentWinners', JSON.stringify(recentWinners));
-        monday.storage.instance.setItem('recentSpins', JSON.stringify(recentWinners));
       }
 
       return {
         recentWinners,
-        recentSpins,
-        jackpot
+        jackpot,
+        spinsRemaining
       };
     });
   }
@@ -183,7 +182,7 @@ class AppSolution extends React.Component {
   render() {
     return (
       <div className="App">
-        <SpinWheel whenResult={this.resultHandler} currentJackpot={this.state.jackpot}></SpinWheel>
+        <SpinWheel whenResult={this.resultHandler} spinsRemaining={this.state.spinsRemaining} currentJackpot={this.state.jackpot}></SpinWheel>
         <div id="recentWinnersDiv">
           <h2>Recent Winners</h2>
           {this.state.recentWinners.map((recentWinner, i) => {

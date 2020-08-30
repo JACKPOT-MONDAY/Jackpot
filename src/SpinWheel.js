@@ -60,7 +60,6 @@ class SpinWheel extends React.Component {
     for (let i = 0; i < numOptions; i++) {
       let text = this.state.list[i];
       this.renderSector(i + 1, text, angle, arcSize, tempColors);
-      console.log(this.getColor())
       angle += arcSize;
     }
     let canvas = document.getElementById("wheel");

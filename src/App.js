@@ -18,7 +18,8 @@ class AppSolution extends React.Component {
       recentSpins: [], // don't let someone spin more than once per week
       addedRows: [], // Monday rows that have already been added to the pot
       me: null, // the person viewing the app
-      jackpot: 0 // dollar amount in the pot
+      jackpot: 0, // dollar amount in the pot
+      context: {}
     };
   }
 
@@ -28,6 +29,7 @@ class AppSolution extends React.Component {
       this.setState({
         settings: res.data
       });
+      this.addRowsToJackpot();
     });
 
     const res = await monday.api(`
@@ -45,8 +47,28 @@ class AppSolution extends React.Component {
     });
 
     monday.listen('context', async (res) => {
-      const context = res.data;
-      console.log('context=', context);
+      this.setState({context:res.data})
+      console.log('context=', res.data);
+      this.addRowsToJackpot();
+    });
+
+    const recentWinners = JSON.parse((await monday.storage.instance.getItem('recentWinners')).data.value);
+    this.setState({
+      recentWinners: recentWinners ? recentWinners : []
+    });
+  }
+
+  addRowsToJackpot = async () => {
+      const settings = this.state.settings;
+      const context = this.state.context;
+      
+      const settingsExist = settings && settings["status_column"] && settings["completed_status"] && settings["jackpot_increase"];
+      // console.log("jackpotContext=",context);
+      // console.log("if conditional", !context || !settingsExist  || !context.boardIds || !context.boardIds[0])
+      // console.log("settings exist",!settingsExist)
+      // console.log("settings",settings)
+      if (!context || !settingsExist  || !context.boardIds || !context.boardIds[0]) return;
+
       const res2 = await monday.api(`
         query ($boardIds: [Int]) {
           boards (ids: $boardIds) {
@@ -83,14 +105,17 @@ class AppSolution extends React.Component {
         const rowId = row.id;
         const rowName = row.name;
         let rowStatus = null;
-        console.log("column===",row)
-        if (row.column_values && row.column_values.find(c => c.title === 'Status')) {
-          rowStatus = row.column_values.find(c => c.title === 'Status').text;
+        const status_column = Object.keys(settings.status_column)[0];
+        // console.log("row column val", row.column_values);
+        // console.log("status column", status_column)
+        if (row.column_values && row.column_values.find(c => c.id=== status_column)) {
+          
+          rowStatus = row.column_values.find(c => c.id === status_column).text;
         }
-        console.log(addedRows.indexOf(rowId));
-        if (rowStatus === 'Done' && addedRows.indexOf(rowId) === -1) {
+        
+        if (rowStatus === settings["completed_status"] && addedRows.indexOf(rowId) === -1) {
           console.log('Adding new row: ' + rowId + ' - ' + rowName);
-          jackpot += 8;
+          jackpot += parseInt(settings["jackpot_increase"]);
           addedRows.push(rowId);
         }
       }
@@ -101,13 +126,6 @@ class AppSolution extends React.Component {
         addedRows,
         jackpot
       });
-      // });
-    });
-
-    const recentWinners = JSON.parse((await monday.storage.instance.getItem('recentWinners')).data.value);
-    this.setState({
-      recentWinners: recentWinners ? recentWinners : []
-    });
   }
 
   resultHandler = async (result) => {

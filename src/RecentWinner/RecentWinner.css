@@ -11,12 +11,18 @@
 }
 
 .RecentWinner .middle {
-  text-align: left;
   flex: 1 1 auto;
+  background: #eee;
+  border-radius: 4px;
+  padding: 8px;
 }
 
 .RecentWinner .right {
   flex: 0 0 100px;
+  background: #eee;
+  border-radius: 4px;
+  padding: 8px;
+  margin-left: 10px;
 }
 
 .RecentWinner img {

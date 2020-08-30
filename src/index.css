@@ -133,6 +133,7 @@
   -ms-grid-row: 1 !important;
   -ms-grid-row-span: 1 !important;
   grid-row: 1 / 2 !important;
+  text-align: center;
 }
 
 canvas {

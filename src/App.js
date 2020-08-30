@@ -25,7 +25,9 @@ class AppSolution extends React.Component {
   async componentDidMount() {
     monday.listen('settings', (res) => {
       console.log('settings=', res.data);
-      this.setState({ settings: res.data });
+      this.setState({
+        settings: res.data
+      });
     });
 
     const res = await monday.api(`
@@ -38,7 +40,9 @@ class AppSolution extends React.Component {
     `);
     const me = res.data.me;
     console.log('me=', me);
-    this.setState({ me });
+    this.setState({
+      me
+    });
 
     monday.listen('context', async (res) => {
       const context = res.data;
@@ -64,37 +68,52 @@ class AppSolution extends React.Component {
           boardIds: [context.boardIds[0]]
         }
       });
-      console.log('boardData=', res2.data);
-      const rows = res2.data.boards[0].items;
-      this.setState(async (prevState) => { 
-        let jackpot = prevState.jackpot;
-        const addedRows = JSON.parse((await monday.storage.instance.getItem('addedRows')).data.value) || [];
-        for (const row in rows) {
-          const rowId = row.id;
-          const rowName = row.name;
-          let rowStatus = null;
-          if (row.column_values && row.column_values.find(c => c.title === 'Status')) {
-            rowStatus = row.column_values.find(c => c.title === 'Status').text;
-          }
-          if (rowStatus === 'Done' && addedRows.indexOf(rowId) === -1) {
-            console.log('Adding new row: ' + rowId + ' - ' + rowName);
-            jackpot += 8;
-            addedRows.push(rowId);
-          }
+
+      console.log('Rows =', res2.data.boards[0]["items"]);
+      const rows = res2.data.boards[0]["items"];
+
+      console.log("jackpopt num check=",(await monday.storage.instance.getItem('jackpot')).data.value)
+      let jackpot = parseInt((await monday.storage.instance.getItem('jackpot')).data.value) || 0;
+      // this.setState(async (prevState) => { 
+      //   let jackpot = prevState.jackpot;
+      const addedRows = JSON.parse((await monday.storage.instance.getItem('addedRows')).data.value) || [];
+      console.log(`addedRows `, addedRows)
+      console.log(`rows `, rows)
+      for (const row of rows) {
+        const rowId = row.id;
+        const rowName = row.name;
+        let rowStatus = null;
+        console.log("column===",row)
+        if (row.column_values && row.column_values.find(c => c.title === 'Status')) {
+          rowStatus = row.column_values.find(c => c.title === 'Status').text;
         }
-        monday.storage.instance.setItem('addedRows', JSON.stringify(addedRows));
-        return { addedRows, jackpot };
+        console.log(addedRows.indexOf(rowId));
+        if (rowStatus === 'Done' && addedRows.indexOf(rowId) === -1) {
+          console.log('Adding new row: ' + rowId + ' - ' + rowName);
+          jackpot += 8;
+          addedRows.push(rowId);
+        }
+      }
+      monday.storage.instance.setItem('addedRows', JSON.stringify(addedRows));
+      monday.storage.instance.setItem('jackpot', jackpot);
+      // return { addedRows, jackpot };
+      this.setState({
+        addedRows,
+        jackpot
       });
+      // });
     });
 
     const recentWinners = JSON.parse((await monday.storage.instance.getItem('recentWinners')).data.value);
-    this.setState({ recentWinners: recentWinners ? recentWinners : [] });
+    this.setState({
+      recentWinners: recentWinners ? recentWinners : []
+    });
   }
 
   resultHandler = async (result) => {
     console.log('result=', result);
 
-    this.setState((prevState) => { 
+    this.setState((prevState) => {
       let recentWinners = prevState.recentWinners || [];
       let recentSpins = prevState.recentSpins || [];
       if (prevState.me) {
@@ -107,7 +126,7 @@ class AppSolution extends React.Component {
             result
           });
 
-          monday.execute('notice', { 
+          monday.execute('notice', {
             message: 'Congratulations! You won ' + result,
             type: 'success', // or 'error' (red), or 'info' (blue)
             timeout: 10000,
@@ -118,7 +137,7 @@ class AppSolution extends React.Component {
           created: dayjs().format(),
           name: prevState.me.name
         });
-        
+
         if (recentWinners.length > 6) {
           recentWinners = recentWinners.slice(0, 6);
         }
@@ -130,8 +149,11 @@ class AppSolution extends React.Component {
         monday.storage.instance.setItem('recentWinners', JSON.stringify(recentWinners));
         monday.storage.instance.setItem('recentSpins', JSON.stringify(recentWinners));
       }
-      
-      return { recentWinners, recentSpins };
+
+      return {
+        recentWinners,
+        recentSpins
+      };
     });
   }
 

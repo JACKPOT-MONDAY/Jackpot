@@ -20,6 +20,7 @@ class SpinWheel extends React.Component {
     offset: null, // RADIANS
     net: null, // RADIANS
     result: null, // INDEX
+    resultAmount: null, // DOLLAR AMOUNT
     spinning: false,
     colors: ["#FB275D","#FFCC00", "#A358DF", "#00CFF4"],
     ended:false
@@ -34,7 +35,6 @@ class SpinWheel extends React.Component {
     if (this.props.currentJackpot === null || prevProps.currentJackpot === this.props.currentJackpot) {
       return;
     }
-    console.log("passed if")
     this.setState(prevState => {
       const list = prevState.list;
       list.pop();
@@ -186,7 +186,6 @@ class SpinWheel extends React.Component {
     // calcalute result after wheel stops spinning
     setTimeout(() => {
       this.getResult(randomSpin);
-      this.setState({ended:true});
     }, 2000);
   };
 
@@ -209,13 +208,17 @@ class SpinWheel extends React.Component {
       result = list.length + count;
     }
 
-    this.props.whenResult(this.state.list[result]);
+    let resultAmount = this.state.list[result];
 
     // set state variable to display result
     this.setState({
       net: netRotation,
-      result: result
+      result,
+      resultAmount,
+      ended: true
     });
+
+    this.props.whenResult(resultAmount);
   };
 
   reset = () => {
@@ -262,13 +265,15 @@ class SpinWheel extends React.Component {
         </div>
       </div>
 
-      {this.state.ended ? (<div className="display" style={{display:"block"}}>
-        
-      <h1 id="readout">{this.state.list[this.state.result] === "$0"? "Awe, better luck next time! You got:": "Congratulations, you win!"}</h1>
-      <p id="result">{this.state.list[this.state.result]}</p>
-      <button id="exitWin" onClick={this.reset}>Okay, take me back!</button>
-      <img src={jackpotImg}  alt=""></img>
-    </div>):(<div></div>)}
+      {this.state.ended
+        ? (<div className="display" style={{display:"block"}}>
+          <h1 id="readout">{this.state.resultAmount === "$0" ? "Awe, better luck next time! You got:" : "Congratulations, you win!"}</h1>
+          <p id="result">{this.state.resultAmount}</p>
+          <button id="exitWin" onClick={this.reset}>Okay, take me back!</button>
+          <img src={jackpotImg}  alt=""></img>
+          </div>)
+        : (<div></div>)
+      }
 
       
       </React.Fragment>

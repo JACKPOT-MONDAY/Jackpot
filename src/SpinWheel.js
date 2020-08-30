@@ -17,7 +17,7 @@ class SpinWheel extends React.Component {
       "$0",
       "$0",
       "$0",
-      "$" + this.props.currentJackpot
+      "$0"
     ],
     radius: 100, // PIXELS
     rotate: 0, // DEGREES
@@ -35,6 +35,20 @@ class SpinWheel extends React.Component {
   componentDidMount() {
     // generate canvas wheel on load
     this.renderWheel();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!this.props.currentJackpot || prevProps.currentJackpot === this.props.currentJackpot) {
+      return;
+    }
+    this.setState(prevState => {
+      const list = prevState.list;
+      list.pop();
+      list.push('$' + this.props.currentJackpot);
+      return { list };
+    }, () => {
+      this.renderWheel();
+    });
   }
 
   getColor() {

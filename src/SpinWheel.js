@@ -28,7 +28,7 @@ class SpinWheel extends React.Component {
     net: null, // RADIANS
     result: null, // INDEX
     spinning: false,
-    colors: ["#FB275D","#FFCC00", "#00CC6F", "#A358DF", "#00CFF4"],
+    colors: ["#FB275D","#FFCC00", "#A358DF", "#00CFF4"],
     ended:false
   };
 
@@ -38,9 +38,11 @@ class SpinWheel extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    console.log("before if")
     if (!this.props.currentJackpot || prevProps.currentJackpot === this.props.currentJackpot) {
       return;
     }
+    console.log("passed if")
     this.setState(prevState => {
       const list = prevState.list;
       list.pop();
@@ -131,20 +133,40 @@ class SpinWheel extends React.Component {
     let endAngle = start + arc - 2*(Math.PI/180);
     let angle = index * arc;
     if (tempColors.length === 0){tempColors = [...this.state.colors]}
-    let color = tempColors.splice(Math.floor(Math.random()*tempColors.length),1)
+    let color;
     ctx.save();
+   
+    if ("$" + this.props.currentJackpot === text) {
+      // let x0 = window.innerWidth/4 - window.innerWidth/20;
+      // let y0 = window.innerHeight/4 - window.innerHeight/20;
+      // let x1 = window.innerWidth/2 + window.innerWidth/4 + window.innerWidth/20;
+      // let y1 = window.innerHeight/2 + window.innerHeight/4 + window.innerHeight/20;
+      let gradient = "#00cc6f";
+      // for (let i = 0; i < this.state.colors.length; i++) {
+      //   const secColor = this.state.colors[i];
+      //   gradient.addColorStop(i/this.state.colors.length, secColor);
+      // }
+      // // gradient.addColorStop(0, `#FB275D`);
+      // // gradient.addColorStop(1, `#FFCC00`);
+      // color = ctx.createLinearGradient(300, 300, 300, 300);
+      ctx.fillStyle = gradient;
+    } else{
+      text = text === "$0" ? "": text;
+      console.log("text", text)
+      color = tempColors.splice(Math.floor(Math.random()*tempColors.length),1);
+      ctx.fillStyle = color;
+      
+    }
     ctx.shadowBlur = 10;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-    ctx.shadowColor = "rgba(0,0,0,0.65)";
+    ctx.shadowColor = "rgba(0,0,0,0.35)";
     ctx.beginPath();
     ctx.moveTo(x,y);
     ctx.arc(x, y, radius*2, startAngle, endAngle, false);
     ctx.lineTo(x,y);
-    ctx.fillStyle = color;
     ctx.fill();
     ctx.restore();
-
     ctx.beginPath();
     ctx.font = "13px Arial";
     ctx.fillStyle = "white";
@@ -196,7 +218,7 @@ class SpinWheel extends React.Component {
       result = list.length + count;
     }
 
-    this.props.whenResult(list[result]);
+    this.props.whenResult("$100");
 
     // set state variable to display result
     this.setState({
@@ -220,17 +242,20 @@ class SpinWheel extends React.Component {
     return (
       <React.Fragment>
       <div className="spinWheelSection">
-        
         <span id="selector">&#9660;</span>
+        <div className="CanvasContainer">
         <canvas
-          id="wheel"
-          width="500"
-          height="500"
-          style={{
-            WebkitTransform: `rotate(${this.state.rotate}deg)`,
-            WebkitTransition: `-webkit-transform ${this.state.easeOut}s ease-out`}}></canvas>
-        
+        id="wheel"
+        width="500"
+        height="500"
+        style={{
+          WebkitTransform: `rotate(${this.state.rotate}deg)`,
+          WebkitTransition: `-webkit-transform ${this.state.easeOut}s ease-out`}}></canvas>
+          
+          <div className="jackpotContainer">Jackpot<br/><span className="bold">${Math.round(this.props.currentJackpot)}</span></div>
 
+        </div>
+        
         {this.state.spinning ? (
           <button type="button" id="reset" onClick={this.reset}>
             reset
@@ -250,7 +275,7 @@ class SpinWheel extends React.Component {
       <img src={jackpotImg}  alt=""></img>
     </div>):(<div></div>)}
 
-      <div className="jackpotContainer">Current Jackpot:<br/><span className="bold">${Math.round(this.props.currentJackpot)}</span></div>
+      
       </React.Fragment>
     );
   }

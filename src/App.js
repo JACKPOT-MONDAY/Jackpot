@@ -134,6 +134,8 @@ class AppSolution extends React.Component {
     this.setState((prevState) => {
       let recentWinners = prevState.recentWinners || [];
       let recentSpins = prevState.recentSpins || [];
+      let jackpot = prevState.jackpopt;
+
       if (prevState.me) {
 
         if (result !== '$0') {
@@ -148,7 +150,9 @@ class AppSolution extends React.Component {
             message: 'Congratulations! You won ' + result,
             type: 'success', // or 'error' (red), or 'info' (blue)
             timeout: 10000,
+            
           });
+          jackpot = 0;
         }
 
         recentSpins.unshift({
@@ -170,7 +174,8 @@ class AppSolution extends React.Component {
 
       return {
         recentWinners,
-        recentSpins
+        recentSpins,
+        jackpot
       };
     });
   }

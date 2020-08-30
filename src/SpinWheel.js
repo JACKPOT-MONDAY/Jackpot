@@ -10,13 +10,6 @@ class SpinWheel extends React.Component {
       "$0",
       "$0",
       "$0",
-      "$0",
-      "$0",
-      "$0",
-      "$0",
-      "$0",
-      "$0",
-      "$0",
       "$0"
     ],
     radius: 100, // PIXELS

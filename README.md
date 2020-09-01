@@ -1,7 +1,8 @@
+[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 ## Inspiration
 We were inspired by how one of our team members already uses Monday to reward their staff by placing monetary rewards on completed items. So we thought... what if we could take it a step further and make a fun, addictive game out of it? That's when Jackpot was born.
-
-##What it does
+ 
+## What it does
 Jackpot app can be added to any board. It will read the board's Person and Status columns to determine which items are "complete", and then to add money to a jackpot for each item. Users can then spin the wheel for a number of times equal to how many items they have personally completed. The more spins, the more chances to win.
 
 ## How we built it
